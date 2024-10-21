@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  low_x: 1
+  high_x: 1
+  low_y: 1
+  high_y: 1
+  found: false
+
+two:
+  name: MyString
+  low_x: 1
+  high_x: 1
+  low_y: 1
+  high_y: 1
+  found: false
