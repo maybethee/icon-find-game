@@ -131,3 +131,7 @@ table {
 h1 {
   color: yellowgreen;
 }
+
+.found {
+  border: solid 3px lime;
+}

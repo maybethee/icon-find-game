@@ -2,6 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import Goal from "./Goal";
 import "./App.css";
 import techIcons from "./assets/techIcons.png";
+import ArgoCD from "./assets/ArgoCD.png";
+import OpenFeign from "./assets/OpenFeign.png";
+import ReadyAPI from "./assets/ReadyAPI.png";
+import VSCode from "./assets/VSCode.png";
 
 function App() {
   const boxRef = useRef(null);
@@ -9,6 +13,12 @@ function App() {
   const iconOptions = useRef(null);
   const containerRef = useRef(null);
   const [coordinates, setCoordinates] = useState({ x: 0, y: 0 });
+  const [foundIcons, setFoundIcons] = useState({
+    ArgoCD: false,
+    OpenFeign: false,
+    ReadyAPI: false,
+    VSCode: false,
+  });
 
   const handleClick = (e) => {
     const element = e.target.getBoundingClientRect();
@@ -56,6 +66,10 @@ function App() {
       .then((data) => {
         if (data.valid) {
           console.log("correct");
+          setFoundIcons((prevFoundIcons) => ({
+            ...prevFoundIcons,
+            [selectedOption]: true,
+          }));
         } else {
           console.log("wrong");
         }
@@ -139,7 +153,21 @@ function App() {
         </div>
         <p>coordinates: {`x: ${coordinates.x}, y: ${coordinates.y}`}</p>
       </div>
-      <Goal />
+      {/* <Goal /> */}
+
+      <h1>looking for:</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "1rem",
+        }}
+      >
+        <Goal found={foundIcons.ArgoCD} imgSrc={ArgoCD} />
+        <Goal found={foundIcons.OpenFeign} imgSrc={OpenFeign} />
+        <Goal found={foundIcons.ReadyAPI} imgSrc={ReadyAPI} />
+        <Goal found={foundIcons.VSCode} imgSrc={VSCode} />
+      </div>
     </>
   );
 }
