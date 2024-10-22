@@ -39,6 +39,28 @@ function App() {
     e.preventDefault();
     const selectedOption = iconOptions.current.elements[0].value;
     console.log(`You selected: ${selectedOption}`);
+
+    const data = {
+      guessedIcon: selectedOption,
+      guessedCoordinates: coordinates,
+    };
+
+    fetch("/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.valid) {
+          console.log("correct");
+        } else {
+          console.log("wrong");
+        }
+      })
+      .catch((error) => console.log(error));
   }
 
   useEffect(() => {
@@ -115,10 +137,7 @@ function App() {
             style={{ width: "1500px", height: "auto" }}
           />
         </div>
-        <p>
-          coordinates:{" "}
-          {`x: ${coordinates.x.toFixed(2)}, y: ${coordinates.y.toFixed(2)}`}
-        </p>
+        <p>coordinates: {`x: ${coordinates.x}, y: ${coordinates.y}`}</p>
       </div>
       <Goal />
     </>
