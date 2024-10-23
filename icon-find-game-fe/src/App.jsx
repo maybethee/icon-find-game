@@ -20,6 +20,22 @@ function App() {
     VSCode: false,
   });
 
+  useEffect(() => {
+    fetch("/start", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("timer started", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
+
   const handleClick = (e) => {
     const element = e.target.getBoundingClientRect();
     const x = (e.clientX - element.left) / element.width;
@@ -70,6 +86,9 @@ function App() {
             ...prevFoundIcons,
             [selectedOption]: true,
           }));
+        } else if (data.score) {
+          console.log(`${data.message} ${data.score}`);
+          // popup
         } else {
           console.log("wrong");
         }
@@ -151,9 +170,9 @@ function App() {
             style={{ width: "1500px", height: "auto" }}
           />
         </div>
+
         <p>coordinates: {`x: ${coordinates.x}, y: ${coordinates.y}`}</p>
       </div>
-      {/* <Goal /> */}
 
       <h1>looking for:</h1>
       <div
