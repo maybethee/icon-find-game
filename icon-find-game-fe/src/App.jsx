@@ -19,6 +19,9 @@ function App() {
     ReadyAPI: false,
     VSCode: false,
   });
+  const [gameOver, setGameOver] = useState(false);
+  const [playerName, setPlayerName] = useState("");
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     fetch("/start", {
@@ -35,6 +38,28 @@ function App() {
         console.error("Error:", error);
       });
   }, []);
+
+  const handleSubmitToLeaderboard = (e) => {
+    e.preventDefault();
+
+    fetch("/save_score", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: playerName }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.message);
+        console.log("leaderboard:", data.leaderboard);
+      })
+      .catch((error) => {
+        console.log("error:", error);
+      });
+
+    setGameOver(false);
+  };
 
   const handleClick = (e) => {
     const element = e.target.getBoundingClientRect();
@@ -86,9 +111,12 @@ function App() {
             ...prevFoundIcons,
             [selectedOption]: true,
           }));
-        } else if (data.score) {
-          console.log(`${data.message} ${data.score}`);
-          // popup
+
+          if (data.score) {
+            console.log(`${data.message} ${data.score}`);
+            setGameOver(true);
+            setScore(data.score);
+          }
         } else {
           console.log("wrong");
         }
@@ -170,6 +198,25 @@ function App() {
             style={{ width: "1500px", height: "auto" }}
           />
         </div>
+
+        {gameOver && (
+          <div>
+            <h3>Game Over</h3>
+            <p>your final time was: {score} </p>
+            <form action="" onSubmit={handleSubmitToLeaderboard}>
+              <label htmlFor="">
+                Name:{" "}
+                <input
+                  type="text"
+                  name="name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                />
+              </label>
+              <button>Submit</button>
+            </form>
+          </div>
+        )}
 
         <p>coordinates: {`x: ${coordinates.x}, y: ${coordinates.y}`}</p>
       </div>
