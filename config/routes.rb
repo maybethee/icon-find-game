@@ -8,9 +8,11 @@ Rails.application.routes.draw do
   post 'validate', to: 'game#validate_guess'
 
   post 'start', to: 'game#start'
-  
-  post 'score', to: 'game#score'
-  
+
+  post 'save_score', to: 'game#save_score'
+
+  get 'top_ten', to: 'game#top_ten'
+
   get '*path', to: 'application#fallback_index_html', constraints: ->(req) { !req.xhr? && req.format.html? }
 
   # Defines the root path route ("/")

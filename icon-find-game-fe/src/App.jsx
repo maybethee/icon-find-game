@@ -22,6 +22,8 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [playerName, setPlayerName] = useState("");
   const [score, setScore] = useState(0);
+  const [leaderboard, setLeaderboard] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     fetch("/start", {
@@ -58,7 +60,9 @@ function App() {
         console.log("error:", error);
       });
 
-    setGameOver(false);
+    setDisabled(true);
+
+    // setGameOver(false);
   };
 
   const handleClick = (e) => {
@@ -143,6 +147,23 @@ function App() {
     };
   }, []);
 
+  const displayLeaderboard = () => {
+    fetch("/top_ten", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setLeaderboard(data);
+      })
+      .catch((error) => {
+        console.log("error:", error);
+      });
+  };
+
   return (
     <>
       <div
@@ -155,39 +176,42 @@ function App() {
         }}
         onClick={() => showBox(position.x, position.y)}
       >
-        <div>
-          <div
-            ref={boxRef}
-            className="box"
-            style={{
-              border: "4px solid black",
-              position: "absolute",
-              visibility: "hidden",
-              width: "100px",
-              height: "100px",
-            }}
-          ></div>
-          <div
-            ref={dropdownRef}
-            style={{
-              position: "absolute",
-              visibility: "hidden",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <form ref={iconOptions} method="get">
-              <select>
-                <option value="ArgoCD">ArgoCD</option>
-                <option value="VSCode">VSCode</option>
-                <option value="OpenFeign">OpenFeign</option>
-                <option value="ReadyAPI">ReadyAPI</option>
-              </select>
-              <button style={{ color: "green" }} onClick={handleSubmitGuess}>
-                ✔
-              </button>
-            </form>
+        {!gameOver && (
+          <div>
+            <div
+              ref={boxRef}
+              className="box"
+              style={{
+                border: "4px solid black",
+                position: "absolute",
+                visibility: "hidden",
+                width: "100px",
+                height: "100px",
+              }}
+            ></div>
+
+            <div
+              ref={dropdownRef}
+              style={{
+                position: "absolute",
+                visibility: "hidden",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <form ref={iconOptions} method="get">
+                <select>
+                  <option value="ArgoCD">ArgoCD</option>
+                  <option value="VSCode">VSCode</option>
+                  <option value="OpenFeign">OpenFeign</option>
+                  <option value="ReadyAPI">ReadyAPI</option>
+                </select>
+                <button style={{ color: "green" }} onClick={handleSubmitGuess}>
+                  ✔
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        )}
 
         <h1>find the icons!</h1>
         <div style={{ display: "inline-block" }}>
@@ -200,9 +224,9 @@ function App() {
         </div>
 
         {gameOver && (
-          <div>
+          <div className="game-over-popup">
             <h3>Game Over</h3>
-            <p>your final time was: {score} </p>
+            <p>your final time was: {score.toFixed(3)} </p>
             <form action="" onSubmit={handleSubmitToLeaderboard}>
               <label htmlFor="">
                 Name:{" "}
@@ -211,17 +235,53 @@ function App() {
                   name="name"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
+                  disabled={disabled}
                 />
               </label>
-              <button>Submit</button>
+              <button disabled={disabled}>Submit</button>
             </form>
+            <button onClick={displayLeaderboard}>Leaderboard</button>
+            <button onClick={() => window.location.reload(false)}>
+              Play Again
+            </button>
+          </div>
+        )}
+
+        {leaderboard && (
+          <div className="leaderboard">
+            <h3>Leaderboard</h3>
+            <table>
+              <tbody>
+                <tr>
+                  <th></th>
+                  <th>NAME</th>
+                  <th>TIME</th>
+                  <th>DATE</th>
+                </tr>
+                {leaderboard.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{entry.name}</td>
+                    <td>{entry.score.toFixed(3)}s</td>
+                    <td>
+                      {new Date(entry.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={() => setLeaderboard(null)}>Back</button>
           </div>
         )}
 
         <p>coordinates: {`x: ${coordinates.x}, y: ${coordinates.y}`}</p>
       </div>
 
-      <h1>looking for:</h1>
+      <h2>looking for:</h2>
       <div
         style={{
           display: "flex",
