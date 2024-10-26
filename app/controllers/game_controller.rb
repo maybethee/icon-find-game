@@ -3,6 +3,7 @@ class GameController < ApplicationController
   @@final_time = nil
 
   def start
+    reset_icons
     Rails.logger.debug('timer started')
     @@timer_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 

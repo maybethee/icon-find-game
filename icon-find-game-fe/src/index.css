@@ -190,3 +190,33 @@ th {
 tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+.notification-container {
+  position: absolute;
+  font-size: 1.1rem;
+  top: 0;
+  left: 40%;
+  animation: slideDown 0.4s ease-out;
+}
+
+/* @keyframes slideUp {
+  from {
+    top: 0;
+    opacity: 1;
+  }
+  to {
+    top: -100px;
+    opacity: 0;
+  }
+} */
+
+@keyframes slideDown {
+  from {
+    top: -100px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}

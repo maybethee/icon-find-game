@@ -6,6 +6,7 @@ import ArgoCD from "./assets/ArgoCD.png";
 import OpenFeign from "./assets/OpenFeign.png";
 import ReadyAPI from "./assets/ReadyAPI.png";
 import VSCode from "./assets/VSCode.png";
+import Notification from "./Notification";
 
 function App() {
   const boxRef = useRef(null);
@@ -24,6 +25,10 @@ function App() {
   const [score, setScore] = useState(0);
   const [leaderboard, setLeaderboard] = useState(null);
   const [disabled, setDisabled] = useState(false);
+  const [notification, setNotification] = useState({
+    type: "",
+    message: "",
+  });
 
   useEffect(() => {
     fetch("/start", {
@@ -34,6 +39,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
+        showNotification("success", "Game Started");
         console.log("timer started", data);
       })
       .catch((error) => {
@@ -55,14 +61,17 @@ function App() {
       .then((data) => {
         console.log(data.message);
         console.log("leaderboard:", data.leaderboard);
+        showNotification("success", "Score successfully submitted.");
       })
       .catch((error) => {
         console.log("error:", error);
+        showNotification(
+          "error",
+          `Failed to submit score, see error: ${error}`
+        );
       });
 
     setDisabled(true);
-
-    // setGameOver(false);
   };
 
   const handleClick = (e) => {
@@ -76,6 +85,20 @@ function App() {
     x: 0,
     y: 0,
   });
+
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        setNotification({ type: "", message: "" });
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+  };
 
   function showBox(x, y) {
     if (boxRef.current) {
@@ -115,6 +138,7 @@ function App() {
             ...prevFoundIcons,
             [selectedOption]: true,
           }));
+          showNotification("success", "You got one!");
 
           if (data.score) {
             console.log(`${data.message} ${data.score}`);
@@ -122,6 +146,7 @@ function App() {
             setScore(data.score);
           }
         } else {
+          showNotification("error", "Sorry, that's wrong!");
           console.log("wrong");
         }
       })
@@ -176,6 +201,11 @@ function App() {
         }}
         onClick={() => showBox(position.x, position.y)}
       >
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          key={notification.key}
+        />
         {!gameOver && (
           <div>
             <div
@@ -225,8 +255,8 @@ function App() {
 
         {gameOver && (
           <div className="game-over-popup">
-            <h3>Game Over</h3>
-            <p>your final time was: {score.toFixed(3)} </p>
+            <h3>You Win!</h3>
+            <p>final time: {score.toFixed(3)}s</p>
             <form action="" onSubmit={handleSubmitToLeaderboard}>
               <label htmlFor="">
                 Name:{" "}
